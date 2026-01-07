@@ -4,7 +4,9 @@ set(STDEXT_STANDALONE_BUILD FALSE)
 if(CMAKE_CURRENT_SOURCE_DIR STREQUAL CMAKE_SOURCE_DIR)
     set(STDEXT_STANDALONE_BUILD TRUE)
     set_property(GLOBAL PROPERTY USE_FOLDERS ON)
-    project(stdext)
+    project(stdext
+        HOMEPAGE_URL https://github.com/Bekenn/stdext/
+        LANGUAGES CXX)
     set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
     set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
     set(CMAKE_CXX_EXTENSIONS OFF)
@@ -23,7 +25,7 @@ endif()
 
 add_library(stdext)
 target_include_directories(stdext PUBLIC include)
-target_compile_features(stdext PUBLIC cxx_std_17)
+target_compile_features(stdext PUBLIC cxx_std_17 c_std_11)
 set_target_properties(stdext PROPERTIES CXX_EXTENSIONS OFF)
 
 if(WIN32)

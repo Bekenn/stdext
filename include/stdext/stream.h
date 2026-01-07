@@ -471,7 +471,7 @@ namespace stdext
     public:
         friend bool operator == (const basic_string_stream_consumer& a, const basic_string_stream_consumer& b) noexcept
         {
-            return a._stream = b._stream;
+            return a._stream == b._stream;
         }
         friend bool operator != (const basic_string_stream_consumer& a, const basic_string_stream_consumer& b) noexcept
         {

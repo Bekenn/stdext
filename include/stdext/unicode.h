@@ -404,7 +404,7 @@ namespace stdext
     {
         auto gen = make_cstring_generator(str);
         auto result = extract_utf32(gen);
-        str = gen.base;
+        str = gen.base();
         return result;
     }
 

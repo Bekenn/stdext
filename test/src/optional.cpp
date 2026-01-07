@@ -8,7 +8,7 @@ STDEXT_DISABLE_WARNING_MSVC(4702)   // unreachable code
 
 #include "types.h"
 
-#include <catch2/catch.hpp>
+#include <catch2/catch_template_test_macros.hpp>
 
 #include <limits>
 #include <tuple>

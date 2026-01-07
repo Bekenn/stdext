@@ -11,6 +11,7 @@
 #pragma once
 
 #include <stdext/consumer.h>
+#include <stdext/function.h>
 #include <stdext/optional.h>
 
 #include <memory>
@@ -295,12 +296,11 @@ namespace stdext
         value_type _v;
     };
 
-    template <typename Iterator, typename TerminationPredicate>
+    template <typename Iterator>
     class terminated_generator
     {
         static_assert(is_iterator_v<Iterator>);
         static_assert(!std::is_const_v<Iterator>);
-        static_assert(std::is_invocable_r_v<bool, TerminationPredicate, iterator_value_type<Iterator>>);
 
     public:
         using iterator_category = generator_tag;
@@ -310,11 +310,13 @@ namespace stdext
         using reference = iterator_reference_type<Iterator>;
         using iterator = Iterator;
 
+        using predicate_type = function_proxy<bool (iterator_value_type<Iterator>)>;
+
     public:
-        explicit terminated_generator(const iterator& i, const TerminationPredicate& term)
+        explicit terminated_generator(const iterator& i, predicate_type term)
             : _i(i), _term(term) { }
         template <typename T1, typename T2,
-            STDEXT_REQUIRES(std::is_constructible_v<iterator, T1> && std::is_constructible_v<TerminationPredicate, T2>)>
+            STDEXT_REQUIRES(std::is_constructible_v<iterator, T1> && std::is_constructible_v<predicate_type, T2>)>
         explicit terminated_generator(T1&& i, T2&& term)
             : _i(stdext::forward<T1>(i)), _term(stdext::forward<T2>(term)) { }
 
@@ -330,7 +332,7 @@ namespace stdext
         }
 
         friend void swap(terminated_generator& a, terminated_generator& b)
-            noexcept(std::is_nothrow_swappable_v<iterator> && std::is_nothrow_swappable_v<TerminationPredicate>)
+            noexcept(std::is_nothrow_swappable_v<iterator>)
         {
             swap(a._i, b._i);
             swap(a._term, b._term);
@@ -343,11 +345,11 @@ namespace stdext
         decltype(auto) operator ++ (int) { assert(!_term(*_i)); return _i++; }
         explicit operator bool () const { return !_term(*_i); }
         const iterator& base() const noexcept { return _i; }
-        const TerminationPredicate& predicate() const noexcept { return _term; }
+        const predicate_type& predicate() const noexcept { return _term; }
 
     private:
         iterator _i;
-        TerminationPredicate _term;
+        predicate_type _term;
     };
 
     template <typename Iterator, typename Sentinel, typename I = std::decay_t<Iterator>, typename S = std::decay_t<Sentinel>,
@@ -388,7 +390,7 @@ namespace stdext
         STDEXT_REQUIRES(is_iterator_v<I> && std::is_invocable_r_v<bool, P, iterator_value_type<I>>)>
     auto make_terminated_generator(Iterator&& i, TerminationPredicate&& term)
     {
-        return terminated_generator<I, P>(stdext::forward<Iterator>(i), stdext::forward<TerminationPredicate>(term));
+        return terminated_generator<I>(stdext::forward<Iterator>(i), stdext::forward<TerminationPredicate>(term));
     }
 
     namespace _private

@@ -31,6 +31,7 @@ namespace stdext
         switch (from)
         {
         case seek_from::begin:
+            assert(offset >= 0);
             p = offset;
             break;
         case seek_from::current:

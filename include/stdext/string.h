@@ -8,6 +8,7 @@
 
 #ifndef STDEXT_STRING_INCLUDED
 #define STDEXT_STRING_INCLUDED
+#include <algorithm>
 #pragma once
 
 #include <stdext/generator.h>
@@ -127,7 +128,7 @@ namespace stdext
             return a._g == b._g
                 && a._state == b._state
                 && a._current == b._current
-                && std::equal(a._value + a._current, a._value + std::size(a._value), b._value);
+                && std::equal(a._value + a._current, a._value + std::size(a._value), b._value + b._current);
         }
 
         friend bool operator != (const to_multibyte_generator& a, const to_multibyte_generator& b) noexcept
@@ -169,7 +170,7 @@ namespace stdext
 
         explicit operator bool() const noexcept
         {
-            return _g || _current == std::size(_value);
+            return bool(_g) || _current != std::size(_value);
         }
 
     private:
@@ -184,7 +185,7 @@ namespace stdext
                     throw std::system_error(errno, std::generic_category());
 
                 _current = std::size(_value) - length;
-                std::move(_value, _value + length, _value + _current);
+                std::move_backward(_value, _value + length, _value + std::size(_value));
                 return;
             }
 
@@ -270,7 +271,8 @@ namespace stdext
             do
             {
                 assert(bool(_g));
-                result = std::mbrtowc(&_value, &*_g, 1, &_state);
+                char c = *_g;
+                result = std::mbrtowc(&_value, &c, 1, &_state);
                 ++_g;
                 if (result == size_t(-1))
                     throw std::system_error(errno, std::generic_category());

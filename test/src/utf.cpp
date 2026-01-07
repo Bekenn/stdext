@@ -2,7 +2,7 @@
 #include <stdext/stream.h>
 #include <stdext/unicode.h>
 
-#include <catch2/catch.hpp>
+#include <catch2/catch_test_macros.hpp>
 
 #include <algorithm>
 #include <memory>

@@ -164,7 +164,10 @@
 
 #define STDEXT_HAS_C_UNICODE 0
 
-#if STDEXT_HAS_INCLUDE(<cuchar>)
+// macOS still doesn't have the C11 Unicode functions for some reason, but
+// libc++ provides a wrapper header that makes it hard to detect that the
+// functionality is missing.
+#if !STDEXT_PLATFORM_MAC && STDEXT_HAS_INCLUDE(<cuchar>)
 #undef STDEXT_HAS_C_UNICODE
 #define STDEXT_HAS_C_UNICODE 1
 #endif
